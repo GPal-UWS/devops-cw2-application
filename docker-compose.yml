@@ -3,6 +3,7 @@ services:
     build:
       context: assignment_2_app
       dockerfile: Dockerfile
+    image: gpaluws/running-api-app:latest
   nginx:
     image: nginx:latest
     ports:
