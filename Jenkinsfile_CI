@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_HUB_USERNAME = 'gpaluws'
+        IMAGE_NAME = "${DOCKER_HUB_USERNAME}/running-api-app"
+        REPO_URL = 'https://github.com/GPal-UWS/devops-cw2-application'
+        REPO_BRANCH = 'main'
+        APP_DIR = 'assignment_2_app'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: "${REPO_BRANCH}", url: "${REPO_URL}"
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh """
+                    cd ${APP_DIR}
+                    docker compose build
+                    docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:v1.${env.BUILD_NUMBER}
+                    """
+            }
+        }
+        
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([string(
+                    credentialsId: 'Docker_Hub_Token',
+                    variable: 'Docker_Hub_Token'
+                    )]) {
+                        sh """
+                            cd ${APP_DIR}
+                            echo "$Docker_Hub_Token" | docker login -u ${DOCKER_HUB_USERNAME} --password-stdin
+                            docker push ${IMAGE_NAME}:v1.${env.BUILD_NUMBER}
+                            docker push ${IMAGE_NAME}:latest
+                        """
+                    }
+            }
+        }
+    }
+}
