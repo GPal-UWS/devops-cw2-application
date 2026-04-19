@@ -1,6 +1,6 @@
 # do not track compiled python files
 __pycache__/
-assignment_1_flask_app/*.pyc
+assignment_2_app/*.pyc
 
 # do not track the virutal environment
 assignment_2_app/venv
